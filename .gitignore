@@ -1,0 +1,45 @@
+# --------------------------
+# LaTeX build files
+# --------------------------
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+
+# --------------------------
+# Python and Jupyter
+# --------------------------
+__pycache__/
+*.py[cod]
+*.ipynb_checkpoints
+*.egg-info/
+*.egg
+*.pkl
+.env/
+venv/
+.envrc
+*.pytest_cache/
+
+# --------------------------
+# Figures and intermediate files
+# --------------------------
+# optionally keep only final figures, ignore temp ones
+*.dat
+*.csv
+
+# --------------------------
+# System files
+# --------------------------
+.DS_Store
+Thumbs.db
+*.swp
