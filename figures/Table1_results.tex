@@ -1,0 +1,28 @@
+\begin{table}[H]
+\centering
+\caption{Comparison of interior point methods across all case studies.}
+\label{tab:results}
+\begin{tabular}{llccc}
+\toprule
+Problem & Method & Iterations & Final Objective & Final $\mu$ \\
+\midrule
+\multirow{4}{*}{Simple 2D} 
+  & Fixed        & 200 & -3.6745 & $2.00\times 10^{0}$ \\
+  & Adaptive     & 200 & -4.8730 & $1.22\times 10^{0}$ \\
+  & Mehrotra     & 100 & -10.7193 & $1.53\times 10^{13}$ \\
+  & SciPy        & --  & -6.6000 & -- \\
+\midrule
+\multirow{4}{*}{Resource Allocation} 
+  & Fixed        & 200 & -178.6101 & $1.24\times 10^{0}$ \\
+  & Adaptive     & 200 & -147.9539 & $1.09\times 10^{0}$ \\
+  & Mehrotra     & 100 & -69.2311  & $8.74\times 10^{14}$ \\
+  & SciPy        & --  & -128.0000 & -- \\
+\midrule
+\multirow{4}{*}{Diet Problem} 
+  & Fixed        & 200 & 41.4757 & $1.24\times 10^{0}$ \\
+  & Adaptive     & 200 & 15.6714 & $6.92\times 10^{-1}$ \\
+  & Mehrotra     & 100 & 35.0447 & $4.31\times 10^{0}$ \\
+  & SciPy        & --  & 6.2000 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}

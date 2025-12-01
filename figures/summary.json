@@ -1,0 +1,44 @@
+{
+  "LP1_Simple2D": {
+    "title": "Simple 2D Problem",
+    "iterations": {
+      "fixed": 200,
+      "adaptive": 200,
+      "mehrotra": 100
+    },
+    "final_objective": {
+      "fixed": -3.6745228004624058,
+      "adaptive": -4.87304540863154,
+      "mehrotra": -10.719275531734825
+    },
+    "scipy": -6.6000000000000005
+  },
+  "LP2_Resource": {
+    "title": "Resource Allocation",
+    "iterations": {
+      "fixed": 200,
+      "adaptive": 200,
+      "mehrotra": 100
+    },
+    "final_objective": {
+      "fixed": -178.61009869286158,
+      "adaptive": -147.9539080794642,
+      "mehrotra": -69.23110018666213
+    },
+    "scipy": -128.0
+  },
+  "LP3_Diet": {
+    "title": "Diet Problem",
+    "iterations": {
+      "fixed": 200,
+      "adaptive": 200,
+      "mehrotra": 100
+    },
+    "final_objective": {
+      "fixed": 41.475674416951705,
+      "adaptive": 15.671409477161735,
+      "mehrotra": 35.04470234731867
+    },
+    "scipy": 6.2
+  }
+}
