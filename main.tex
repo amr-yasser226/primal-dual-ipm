@@ -1,0 +1,369 @@
+\documentclass[11pt,a4paper]{article}
+
+% ---------------------------------------------------------
+% PACKAGES
+% ---------------------------------------------------------
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{microtype}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pdfpages} % kept for optional full-page inserts if ever needed
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection.}{0.5em}{}
+
+% A small command for a blank footnote on first page (license)
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+% ---------------------------------------------------------
+% TITLE & AUTHOR
+% ---------------------------------------------------------
+\title{\textbf{Primal--Dual Interior--Point Methods for Linear Programming:\\
+Implementation, Analysis, and Case Studies}}
+\author{Amr Yasser Anwar\thanks{Dept. of CSAI, Zewail City, University of Science and Technology, Egypt.}}
+\date{\today}
+
+% ---------------------------------------------------------
+% DOCUMENT
+% ---------------------------------------------------------
+\begin{document}
+\maketitle
+
+% Bottom-of-first-page license footnote as requested
+\blfootnote{This work is licensed under a \href{https://creativecommons.org/licenses/by-sa/4.0/}{Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) License}.}
+
+\begin{abstract}
+Interior Point Methods (IPMs) form one of the most powerful families of algorithms for solving linear programming problems. 
+In this report, we implement and compare three primal--dual IPMs: (1) a Central Path method with fixed step size and fixed centering parameter, (2) a variant with adaptive step size and adaptive centering parameter, and (3) Mehrotra's Predictor--Corrector method. 
+We then evaluate all algorithms on three case studies---a 2D toy LP, a resource allocation LP, and a diet LP---with detailed convergence plots, trajectory visualization, and comparison to the built-in SciPy implementation of Mehrotra's method. 
+All results, figures, and analysis are reproducible via the provided Jupyter notebook.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+% ---------------------------------------------------------
+% 1. INTRODUCTION
+% ---------------------------------------------------------
+\section{Introduction}
+Interior Point Methods (IPMs) represent a class of algorithms that approach the optimal solution of a linear program (LP) by following the \emph{central path}. 
+Since the breakthrough work of Karmarkar in 1984, IPMs have evolved into some of the most computationally efficient and theoretically elegant methods for convex optimization. 
+
+This report focuses on implementing and experimentally evaluating three important primal--dual IPMs:
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Central Path IPM with fixed step size and centering parameter.}
+    \item \textbf{Central Path IPM with adaptive step size and centering parameter.}
+    \item \textbf{Mehrotra's Predictor--Corrector method.}
+\end{enumerate}
+
+All implementations are written in Python and validated against SciPy's IPM (HiGHS).  
+The complete source code and figures are contained in:
+\texttt{notebook/interior\_point\_methods.ipynb} and \texttt{figures/}.
+
+% ---------------------------------------------------------
+% 2. PRIMAL-DUAL INTERIOR POINT METHODS
+% ---------------------------------------------------------
+\section{Primal--Dual Interior Point Methods}
+
+We consider the standard LP form:
+\[
+\min_{x} \ c^\top x \quad \text{s.t.} \quad Ax = b,\ x \ge 0.
+\]
+The associated dual problem is
+\[
+\max_{y,s} \ b^\top y \quad \text{s.t.} \quad A^\top y + s = c,\ s \ge 0.
+\]
+
+The primal-dual system of optimality conditions is:
+\[
+Ax = b,\qquad A^\top y + s = c,\qquad Xs = 0,\qquad x,s \ge 0.
+\]
+
+A primal-dual IPM replaces the complementarity condition $Xs=0$ with a relaxed equation:
+\[
+Xs = \mu e,
+\]
+where $\mu > 0$ is reduced progressively toward zero.
+
+The Newton direction for $(x,y,s)$ is obtained by solving the linearized KKT system. 
+Different choices of step size $\alpha$ and centering parameter $\sigma$ lead to the three variants implemented in this report.
+
+% For brevity in this snippet, keep the theoretical sections as you already have them.
+% (Insert the Newton system derivation and algorithm descriptions here exactly as in your previous draft.)
+
+% ---------------------------------------------------------
+% 3. ALGORITHMIC VARIANTS
+% ---------------------------------------------------------
+\section{Algorithms Implemented}
+
+\subsection{Central Path Method (Fixed Parameters)}
+This baseline method keeps both the step size $\alpha$ and the centering parameter $\sigma$ constant.
+It follows a ``pure'' approximation of the central path.
+
+\subsection{Central Path Method (Adaptive Parameters)}
+This method adapts the step size and centering parameter based on residual norms, improving robustness and convergence stability.
+
+\subsection{Mehrotra Predictor--Corrector}
+Mehrotra's method introduces:
+\begin{itemize}
+    \item A predictor (affine-scaling) direction,
+    \item A corrector direction to improve centrality,
+    \item A nonlinear update of $\sigma$.
+\end{itemize}
+
+This is the de-facto standard in modern linear programming solvers due to its efficiency and practical convergence speed.
+
+The pseudocode for all three algorithms is provided in Appendix~\ref{appendix:pseudocode}.
+
+% ---------------------------------------------------------
+% 4. CASE STUDIES
+% ---------------------------------------------------------
+\section{Case Studies}
+
+Three LPs were used:
+
+\begin{enumerate}[label=\textbf{LP\arabic*:}]
+    \item \textbf{Simple 2D LP} (toy problem for visualization)
+    \item \textbf{Resource Allocation} (medium-scale)
+    \item \textbf{Diet Problem} (classic LP benchmark)
+\end{enumerate}
+
+Full-page graphical summaries for each LP appear in the Appendix.
+
+% ---------------------------------------------------------
+% 5. RESULTS
+% ---------------------------------------------------------
+\section{Numerical Results}
+
+\subsection{Convergence Analysis}
+Figure~\ref{fig:convergence} reports the objective value vs.\ iteration for all methods.
+
+\begin{figure}[H]
+    \centering
+    % using PDF versions as requested (vector quality)
+    \includegraphics[width=0.95\textwidth]{figures/Fig1_main_convergence.pdf}
+    \caption{Objective reduction versus iteration for the three algorithms across all case studies.}
+    \label{fig:convergence}
+\end{figure}
+
+\subsection{Trajectory Analysis}
+Figure~\ref{fig:trajectories} shows primal trajectories (projection onto $(x_1,x_2)$) and how each algorithm follows the central path.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/Fig2_trajectories.pdf}
+    \caption{Central-path trajectories (PDF images included for publication quality).}
+    \label{fig:trajectories}
+\end{figure}
+
+\subsection{Quantitative Comparison}
+Table~\ref{tab:results} summarizes iterations, final objective values, and complementarity measures. The table is generated by the notebook and saved as \texttt{figures/Table1\_results.tex}.
+
+\input{figures/Table1_results.tex}
+
+\subsection{Remarks on numerical behaviour}
+(--- keep the diagnostic discussion about large $\mu$ values, scaling and regularization ---)
+
+% ---------------------------------------------------------
+% 6. CONCLUSION
+% ---------------------------------------------------------
+\section{Conclusion}
+
+This work implemented and compared three primal-dual interior point algorithms, demonstrating the trade-offs between basic central path tracking, adaptive improvements, and Mehrotra's highly efficient predictor--corrector framework.
+
+Across all experiments, Mehrotra's method achieves the fastest convergence in terms of iterations, although adaptive variants sometimes achieve lower final objective values on specific LP structures.
+
+All experiments are fully reproducible through the included Jupyter notebook.
+
+% ---------------------------------------------------------
+% APPENDIX
+% ---------------------------------------------------------
+\clearpage
+\appendix
+\section{Appendix (Complete)}
+\addcontentsline{toc}{section}{Appendix}
+
+% -----------------------
+% Appendix A: Case Study Visualizations (inline figures, not full-page)
+% -----------------------
+\section{Case Study Visualizations}\label{appendix:figures}
+The detailed distance-to-optimum PDFs generated by the notebook are included below as figures (rendered from the PDF files) so they appear as standard figures with captions rather than as full standalone pages.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/AppendixA_LP1_Simple2D_distance.pdf}
+  \caption{LP1 (Simple 2D) -- distance-to-optimum analysis.}
+  \label{fig:appendix_lp1}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/AppendixA_LP2_Resource_distance.pdf}
+  \caption{LP2 (Resource Allocation) -- distance-to-optimum analysis.}
+  \label{fig:appendix_lp2}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/AppendixA_LP3_Diet_distance.pdf}
+  \caption{LP3 (Diet Problem) -- distance-to-optimum analysis.}
+  \label{fig:appendix_lp3}
+\end{figure}
+
+% -----------------------
+% Appendix B: Algorithm Pseudocode (framed algorithm blocks)
+% -----------------------
+\section{Algorithm Pseudocode}\label{appendix:pseudocode}
+Below are the algorithm blocks in the framed, numbered style you requested (algorithm + algpseudocode).
+
+\subsection*{Phase I (Sketch) \quad (for infeasible starts)}
+\begin{algorithm}[H]
+\caption{Phase I (sketch)}
+\begin{algorithmic}[1]
+\Require $A,b$
+\State Build $A_{\mathrm{aux}} = [A \mid I_m]$, \; $c_{\mathrm{aux}} = [0_n;\,1_m]$
+\State Initialize basis $B \leftarrow$ indices of artificial columns
+\State \texttt{Run RevisedSimplex}($A_{\mathrm{aux}},\,b,\,c_{\mathrm{aux}},\,B$) until optimal
+\If{optimal objective $>\varepsilon$}
+  \State \Return INFEASIBLE
+\Else
+  \State Remove artificial columns from basis (pivot out or drop redundant rows)
+  \State \Return feasible basis $B_{\mathrm{feasible}}$
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Revised Simplex (Phase II) — LU-based}
+\begin{algorithm}[H]
+\caption{Revised Simplex (Phase II) — LU-based}
+\begin{algorithmic}[1]
+\Require $A\in\mathbb{R}^{m\times n}$, $b\in\mathbb{R}^m$, $c\in\mathbb{R}^n$, feasible basis $B$
+\Ensure Optimal basis and solution or certificate of unboundedness
+\State Compute LU factorization of $B$ (with pivoting)
+\State Compute $x_B \leftarrow B^{-1} b$ (solve via LU)
+\For{iteration = 1 \textbf{to} \texttt{max\_iters}}
+  \State Compute $y \leftarrow B^{-\top} c_B$ (solve LU-transpose)
+  \State For each $j\in N$: compute reduced cost $\bar{c}_j = c_j - a_j^\top y$
+  \If{all $\bar{c}_j \le \mathrm{tol}$ for $j\in N$}
+    \State \Return (optimal, $x$)
+  \EndIf
+  \State Choose entering index $q\in N$ (pricing rule; e.g., largest $\bar{c}_j$ or Bland)
+  \State Solve $B d = a_q$ for direction $d$ (LU solve)
+  \If{$d \le \mathrm{tol}$ componentwise}
+    \State \Return (unbounded)
+  \EndIf
+  \State Compute step length $\theta^* = \min\{x_{B_i}/d_i : d_i>\mathrm{tol}\}$ and leaving index $p$
+  \State Pivot: replace $p$ by $q$ in basis indices
+  \State Update LU factorization (rebuild or use efficient update)
+  \State Update $x_B \leftarrow x_B - \theta^* d$ and set $x_q = \theta^*$
+\EndFor
+\State \Return (max\_iters\_reached)
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Central Path IPM (Fixed step and centering)}
+\begin{algorithm}[H]
+\caption{Central Path IPM (Fixed)}
+\begin{algorithmic}[1]
+\Require $A,b,c$, initial strictly positive $(x^0,y^0,s^0)$, fixed $\alpha\in(0,1)$, fixed $\sigma\in[0,1]$
+\State $k\leftarrow 0$
+\Repeat
+  \State Compute residuals $r_c = X^k S^k e - \sigma\mu^k e$, $r_p = A x^k - b$, $r_d = A^\top y^k + s^k - c$
+  \State Form $D^k = \mathrm{diag}(x^k / s^k)$ and Schur matrix $M^k = A D^k A^\top$
+  \State Solve $M^k \Delta y = -r_p - A D^k (r_d - X^{-1} r_c)$ (with reg. if needed)
+  \State $\Delta s \leftarrow -r_d - A^\top \Delta y$
+  \State $\Delta x \leftarrow -S^{-1}(r_c + X \Delta s)$
+  \State $\alpha_k \leftarrow \min\{\alpha, \; \text{max step keeping } x^{k}+\alpha_k\Delta x>0,\; s^{k}+\alpha_k\Delta s>0\}$
+  \State $x^{k+1} \leftarrow x^k + \alpha_k \Delta x$; \ $y^{k+1} \leftarrow y^k + \alpha_k \Delta y$; \ $s^{k+1} \leftarrow s^k + \alpha_k \Delta s$
+  \State $k\leftarrow k+1$
+\Until{primal--dual gap and $\mu$ below tolerance or $k$ exceeds max\_iters}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Central Path IPM (Adaptive)}
+\begin{algorithm}[H]
+\caption{Central Path IPM (Adaptive)}
+\begin{algorithmic}[1]
+\Require $A,b,c$, initial $(x^0,y^0,s^0)$ positive, safety parameters (e.g., 0.99)
+\State $k\leftarrow 0$
+\Repeat
+  \State Compute residuals $r_p,r_d,r_c$ and $\mu^k$
+  \State {\bf Predictor (affine)}: solve with $\sigma=0$ to get $(\Delta x_{\text{aff}},\Delta y_{\text{aff}},\Delta s_{\text{aff}})$
+  \State Compute maximal affine step $\alpha_{\text{aff}}$ and $\beta_{\text{aff}}$
+  \State Compute $\mu_{\text{aff}} = \frac{(x^k+\alpha_{\text{aff}}\Delta x_{\text{aff}})^\top (s^k+\beta_{\text{aff}}\Delta s_{\text{aff}})}{n}$
+  \State Set $\sigma^k = (\mu_{\text{aff}}/\mu^k)^3$ (clip to $[10^{-6},1]$)
+  \State {\bf Corrector}: solve full system with $\sigma=\sigma^k$ to get $(\Delta x,\Delta y,\Delta s)$
+  \State Compute step sizes with safety factor and update $(x,y,s)$
+  \State $k\leftarrow k+1$
+\Until{convergence}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Mehrotra Predictor--Corrector}
+\begin{algorithm}[H]
+\caption{Mehrotra Predictor--Corrector}
+\begin{algorithmic}[1]
+\Require $A,b,c$, initial $(x^0,y^0,s^0)>0$, tolerance, safety factors
+\State $k\leftarrow 0$
+\Repeat
+  \State Compute residuals $r_p,r_d,r_c$ and current $\mu^k$
+  \State {\bf Predictor (affine)}: solve with $\sigma=0$ $\Rightarrow$ $(\Delta x_{\text{aff}},\Delta y_{\text{aff}},\Delta s_{\text{aff}})$
+  \State Compute affine step lengths $\alpha_{\text{aff}},\beta_{\text{aff}}$
+  \State Compute $\mu_{\text{aff}} = ((x^k+\alpha_{\text{aff}}\Delta x_{\text{aff}})^\top (s^k+\beta_{\text{aff}}\Delta s_{\text{aff}}))/n$
+  \State Compute centering parameter: $\sigma^k = (\mu_{\text{aff}}/\mu^k)^3$ (clip into $[10^{-6},1]$)
+  \State Form combined RHS: $-X S e + \Delta X_{\text{aff}} \Delta S_{\text{aff}} e - \sigma^k \mu^k e$
+  \State {\bf Corrector}: solve the (same-coefficient) system with that RHS to get $(\Delta x, \Delta y, \Delta s)$
+  \State Optionally apply second-order correction if implemented
+  \State Compute safe step sizes $\alpha_k,\beta_k$ and update $x,y,s$
+  \State $k\leftarrow k+1$
+\Until{convergence or max iterations}
+\end{algorithmic}
+\end{algorithm}
+
+% -----------------------
+% Appendix C: Extra Notes & reproduction
+% -----------------------
+\section{Additional notes and reproducibility}
+All computations were performed in Python (3.10/3.11). The notebook reproduces figures and writes \texttt{figures/summary.json} and \texttt{figures/Table1\_results.tex}.  
+
+% -----------------------
+% Bibliography & License
+% -----------------------
+\clearpage
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{references}
+
+\clearpage
+\section*{License}
+This work is licensed under a \href{https://creativecommons.org/licenses/by-sa/4.0/}{Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) License}.
+\addcontentsline{toc}{section}{License}
+
+\end{document}
